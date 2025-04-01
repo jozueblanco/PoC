@@ -1,0 +1,54 @@
+services:
+  manager:
+    image: base3
+    volumes:
+      - vprincipal:/var/lib/mysql
+      - ./scripts/manager/my.cnf:/etc/mysql/my.cnf:ro
+    ports:
+      - 33061:3306
+    deploy:
+      replicas: 1
+    networks:
+      -  proyecto
+    restart: always
+  replica:
+    image: base3
+    depends_on:
+      - manager1
+    links:
+      - manager1
+    volumes:
+      - replica:/var/lib/mysql
+      - ./scripts/script.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./scripts/replica/my.cnf:/etc/mysql/my.cnf:ro
+    ports:
+      - 33062:3306
+    deploy:
+      replicas: 1
+    networks:
+      -  proyecto
+    restart: always
+
+  replica2:
+    image: base3
+    depends_on:
+      - manager1
+    links:
+      - manager1
+    volumes:
+      - replica2:/var/lib/mysql
+      - ./scripts/script.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./scripts/replica2/my.cnf:/etc/mysql/my.cnf:ro
+    ports:
+      - 33063:3306
+    deploy:
+      replicas: 1
+    networks:
+      - proyecto
+    restart: always
+volumes:
+  vprincipal:
+  replica:
+  replica2:
+networks:
+  proyecto:
